@@ -4,41 +4,44 @@ import { useState, useEffect, Suspense } from "react"
 import { useForm, SubmitHandler, UseFormRegisterReturn } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2 } from "lucide-react"
+import { Loader2, HeartHandshake } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 
-// ====== Schema Validasi ======
+/* ================= SCHEMA ================= */
 const formSchema = z.object({
   nama: z.string().min(2, "Nama minimal 2 karakter"),
-  email: z.string().email("Format email tidak valid"),
+  email: z.string().email("Email tidak valid"),
   nohp: z
     .string()
-    .min(8, "Nomor HP terlalu pendek")
-    .regex(/^[0-9+]+$/, "Hanya angka atau tanda +"),
-  lari: z.enum(["FAMILY - 2,5K", "CASUAL - 5K", "RACE - 10K"]),
-  jersey: z.string().min(1, "Wajib pilih ukuran jersey"),
-  pembayaran: z.string().min(1, "Wajib pilih metode pembayaran"),
-  fundriser: z.string().optional(),
+    .min(8, "Nomor terlalu pendek")
+    .regex(/^[0-9+]+$/, "Hanya angka & +"),
+  nominal: z.string().min(1, "Pilih nominal sedekah"),
+  metode: z.string().min(1, "Pilih metode pembayaran"),
+  komitmen: z.boolean().refine((val) => val === true, {
+    message: "Wajib menyetujui komitmen",
+  }),
+  referrer: z.string().optional(),
 })
 
 type FormValues = z.infer<typeof formSchema>
 
 const GOOGLE_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbyepCFd9Chfse9obYsuMxcdFYzoLR4KFEAH2SSvd0SQGildOO2kYxTX_j2IIc7nZ6s/exec"
+  "https://script.google.com/macros/s/AKfycbxcii1m6RvDIqbu3HjvGusBh1eI2w4Su5WnrWCuhIME8ikaHoZEHz6BrE0xNRNLzaCmLA/exec"
 
+/* ================= WRAPPER ================= */
 export default function RegistrasiSectionWrapper() {
   return (
-    <Suspense fallback={<div className="text-center py-20">Loading form...</div>}>
+    <Suspense fallback={<div className="py-20 text-center">Memuat form…</div>}>
       <RegistrasiSection />
     </Suspense>
   )
 }
 
+/* ================= MAIN FORM ================= */
 function RegistrasiSection() {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
-  const [activeFundriser, setActiveFundriser] = useState("Tanpa Fundriser")
 
   const {
     register,
@@ -48,23 +51,32 @@ function RegistrasiSection() {
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     mode: "onBlur",
-    defaultValues: { fundriser: "Tanpa Fundriser" },
+    defaultValues: {
+      komitmen: false,
+    },
   })
 
+  /* ===== Ambil data dari CTA (localStorage & URL) ===== */
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search)
-      const fundriserFromLink = params.get("fundriser")
-      const stored = localStorage.getItem("fundriser")
-      const finalFundriser = fundriserFromLink || stored || "Tanpa Fundriser"
+    // nominal dari CTA
+    const storedNominal = localStorage.getItem("donation_amount")
+    if (storedNominal) {
+      setValue("nominal", storedNominal)
+    }
 
-      setActiveFundriser(finalFundriser)
-      setValue("fundriser", finalFundriser)
-      if (fundriserFromLink) localStorage.setItem("fundriser", fundriserFromLink)
+    // referrer / source
+    const params = new URLSearchParams(window.location.search)
+    const ref =
+      params.get("ref") || localStorage.getItem("referrer")
+
+    if (ref) {
+      setValue("referrer", ref)
+      localStorage.setItem("referrer", ref)
     }
   }, [setValue])
 
-  const handleSubmitForm: SubmitHandler<FormValues> = async (data) => {
+  /* ================= SUBMIT ================= */
+  const onSubmit: SubmitHandler<FormValues> = async (data) => {
     if (submitting) return
     setSubmitting(true)
 
@@ -74,93 +86,121 @@ function RegistrasiSection() {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams(data as any),
       })
-      if (!res.ok) throw new Error("Gagal simpan ke Google Sheets")
 
-      toast.success("Registrasi berhasil ✅", {
-        description: "Kamu akan diarahkan ke halaman konfirmasi pembayaran...",
+      if (!res.ok) throw new Error("Gagal submit")
+
+      toast.success("Terima kasih 🤍", {
+        description: "Tim kami akan menghubungi Anda via WhatsApp.",
       })
 
+      // conversion tracking
+      window.gtag?.("event", "complete_registration", {
+        funnel: "kakak_asuh",
+      })
+      window.fbq?.("track", "CompleteRegistration")
+
       setTimeout(() => {
-        const query = new URLSearchParams(data as any).toString()
-        router.push(`/konfirmasi?${query}`)
+        router.push("/terima-kasih")
       }, 1200)
-    } catch (err) {
-      console.error(err)
-      toast.error("Registrasi Gagal ❌", {
-        description: "Terjadi kesalahan. Coba lagi ya 🙏",
+    } catch {
+      toast.error("Gagal mengirim", {
+        description: "Silakan coba lagi 🙏",
       })
     } finally {
       setSubmitting(false)
     }
   }
 
+  /* ================= UI ================= */
   return (
     <section
       id="registrasi"
-      className="py-20 px-4 bg-gradient-to-b from-green-50 via-white to-green-50"
+      className="scroll-mt-24 bg-gradient-to-b from-green-50 via-white to-green-50 px-4 py-20"
     >
-      <div className="w-full max-w-md mx-auto">
-        <div className="bg-white rounded-3xl shadow-lg border border-green-100 p-6 md:p-10">
-          <h2 className="text-3xl font-bold text-green-700 text-center">
-            Form Registrasi Peserta
+      <div className="mx-auto max-w-md">
+        <div className="rounded-3xl border border-green-100 bg-white p-6 shadow-xl md:p-10">
+          <h2 className="text-center text-3xl font-bold text-green-700">
+            Jadi Kakak Asuh
           </h2>
-          <p className="text-sm text-gray-600 text-center mt-2">
-            Lengkapi data di bawah ini. Setelah submit, kamu akan diarahkan ke
-            halaman konfirmasi pembayaran.
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Satu komitmen Anda, satu masa depan anak terjaga.
           </p>
 
-          <form onSubmit={handleSubmit(handleSubmitForm)} className="mt-8 space-y-6">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="mt-8 space-y-6"
+          >
             <FormInput
               label="Nama Lengkap"
               register={register("nama")}
               error={errors.nama?.message}
-              placeholder="cth: Budi Santoso"
             />
             <FormInput
               label="Email"
               type="email"
               register={register("email")}
               error={errors.email?.message}
-              placeholder="cth: email@gmail.com"
             />
             <FormInput
-              label="No HP / WhatsApp"
+              label="No WhatsApp"
               register={register("nohp")}
               error={errors.nohp?.message}
-              placeholder="cth: 08123456789"
-            />
-            <FormSelect
-              label="Kategori Lari"
-              register={register("lari")}
-              error={errors.lari?.message}
-              options={["FAMILY - 2,5K", "CASUAL - 5K", "RACE - 10K"]}
-            />
-            <FormSelect
-              label="Ukuran Jersey"
-              register={register("jersey")}
-              error={errors.jersey?.message}
-              options={["S (P=66, L=48, Lengan=21)", "M (P=68, L=50, Lengan=22)", "L (P=71, L=52, Lengan=23)", "XL (P=74, L=54, Lengan=24)", "XXL (P=77, L=56, Lengan=25)"]}
-            />
-            <FormSelect
-              label="Metode Pembayaran"
-              register={register("pembayaran")}
-              error={errors.pembayaran?.message}
-              options={["Transfer Bank", "E-Wallet (OVO/Gopay/Dana)"]}
             />
 
-            <input type="hidden" {...register("fundriser")} />
+            <FormSelect
+              label="Nominal Sedekah / Bulan"
+              register={register("nominal")}
+              error={errors.nominal?.message}
+              options={[
+                { label: "Rp 50.000", value: "50000" },
+                { label: "Rp 100.000", value: "100000" },
+                { label: "Rp 250.000", value: "250000" },
+              ]}
+            />
+
+            <FormSelect
+              label="Metode Pembayaran"
+              register={register("metode")}
+              error={errors.metode?.message}
+              options={[
+                { label: "Transfer Bank", value: "bank" },
+                { label: "E-Wallet (OVO / Gopay / Dana)", value: "ewallet" },
+              ]}
+            />
+
+            {/* Komitmen */}
+            <label className="flex items-start gap-3 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                {...register("komitmen")}
+                className="mt-1 accent-green-600"
+              />
+              <span>
+                Saya bersedia menjadi Kakak Asuh dan menunaikan sedekah rutin
+                sesuai kemampuan.
+              </span>
+            </label>
+            {errors.komitmen && (
+              <p className="text-sm text-red-500">
+                {errors.komitmen.message}
+              </p>
+            )}
 
             <button
               type="submit"
               disabled={submitting}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 text-white font-semibold py-3 hover:bg-green-700 transition disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 py-3 font-semibold text-white transition hover:bg-green-700 disabled:opacity-60"
             >
               {submitting ? (
                 <>
-                  <Loader2 className="h-5 w-5 animate-spin" /> Mengirim...
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Mengirim…
                 </>
               ) : (
-                "Daftar Sekarang"
+                <>
+                  <HeartHandshake className="h-5 w-5" />
+                  Saya Siap Menjadi Kakak Asuh
+                </>
               )}
             </button>
           </form>
@@ -170,13 +210,13 @@ function RegistrasiSection() {
   )
 }
 
-// ====== Helper Components ======
+/* ================= HELPERS ================= */
+
 interface FormInputProps {
   label: string
   register: UseFormRegisterReturn
   error?: string
   type?: string
-  placeholder?: string
 }
 
 function FormInput({
@@ -184,16 +224,16 @@ function FormInput({
   register,
   error,
   type = "text",
-  placeholder,
 }: FormInputProps) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <label className="mb-1 block text-sm font-medium text-gray-700">
+        {label}
+      </label>
       <input
         type={type}
         {...register}
-        placeholder={placeholder}
-        className="w-full rounded-xl border border-green-200 px-4 py-2.5 outline-none focus:ring-2 focus:ring-green-500 bg-white"
+        className="w-full rounded-xl border border-green-200 px-4 py-2.5 outline-none focus:ring-2 focus:ring-green-500"
       />
       {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
     </div>
@@ -204,21 +244,28 @@ interface FormSelectProps {
   label: string
   register: UseFormRegisterReturn
   error?: string
-  options: string[]
+  options: { label: string; value: string }[]
 }
 
-function FormSelect({ label, register, error, options }: FormSelectProps) {
+function FormSelect({
+  label,
+  register,
+  error,
+  options,
+}: FormSelectProps) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <label className="mb-1 block text-sm font-medium text-gray-700">
+        {label}
+      </label>
       <select
         {...register}
-        className="w-full rounded-xl border border-green-200 px-4 py-2.5 outline-none focus:ring-2 focus:ring-green-500 bg-white"
+        className="w-full rounded-xl border border-green-200 px-4 py-2.5 outline-none focus:ring-2 focus:ring-green-500"
       >
         <option value="">-- Pilih {label} --</option>
         {options.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
           </option>
         ))}
       </select>

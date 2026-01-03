@@ -1,125 +1,25 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import AOS from "aos";
-import "aos/dist/aos.css";
-
-import Navbar from "@/components/Header"
-import Hero from "@/components/Hero"
-import TentangKami from "@/components/TentangKami"
-
+import HeroKakakAsuh from "@/components/kakak-asuh/Hero"
+import ProblemSection from "@/components/kakak-asuh/Problem"
+import ScaleSection from "@/components/kakak-asuh/Scale"
+import SolutionSection from "@/components/kakak-asuh/Solution"
+import ImpactSection from "@/components/kakak-asuh/Impact"
+import CTASection from "@/components/kakak-asuh/CTA"
 import Footer from "@/components/Footer"
-import HybridWhatsAppCTA from "@/components/HybridWhatsAppCTA"
-import PricingSection from "@/components/TiketSection";
-import TimelineSection from "@/components/TimelineSection";
-import RundownSection from "@/components/RundownSection";
-import WhyJoinSection from "@/components/WhyJoinSection";
-import RealisasiSection from "@/components/RealisasiSection";
-import OrganizerSection from "@/components/OrganizerSection";
-import SponsorSection from "@/components/SponsorSection";
-//import PrizeSection from "@/components/PrizeSection";
-import dynamic from "next/dynamic"
+import Navbar from "@/components/Header"
 
-const PrizeSection = dynamic(() => import("@/components/PrizeSection"), {
-  ssr: false,
-})
-
-interface SheetData {
-  [key: string]: { elements: any[] };
-}
-
-const LandingPage: React.FC = () => {
-  const [sheetData, setSheetData] = useState<SheetData>({});
-  const router = useRouter();
-
-  useEffect(() => {
-    AOS.init({ duration: 1000, once: true });
-
-    const sheetId = "YOUR_SPREADSHEET_ID";
-    const sections = ["Hero", "Fitur", "Harga", "Kontak", "Testimoni"];
-
-    const fetchSheetData = async () => {
-      try {
-        const data: SheetData = {};
-        await Promise.all(
-          sections.map(async (section) => {
-            const response = await fetch(`https://opensheet.elk.sh/${sheetId}/${section}`);
-            const json = await response.json();
-            data[section] = { elements: json };
-          })
-        );
-        setSheetData(data);
-      } catch (err) {
-        console.error("Error fetching sheet data:", err);
-      }
-    };
-
-    fetchSheetData();
-  }, []);
-
+export default function Home() {
   return (
-    <main className="relative">
-          {/* Navbar */}
-          <Navbar />
-    
-          {/* Hero */}
-          <section id="hero">
-            <Hero />
-          </section>
-    
-          {/* Tentang Kami */}
-          <section id="tentang">
-            <TentangKami />
-          </section>
-
-          {/* Organizer */}
-          <section id="organizer">
-            <OrganizerSection />
-          </section>
-    
-          {/* Time Line */}
-          <section id="timeline">
-            <TimelineSection />
-          </section>
-
-          {/* Testimoni */}
-          <section id="rundown">
-            <RundownSection />
-          </section>
-
-          {/* Tiket */}
-          <section id="biaya">
-            <PricingSection />
-          </section>
-
-          {/* Kenapa */}
-          <section id="kenapa">
-            <WhyJoinSection />
-          </section>
-
-        {/* Hadiah */}
-          <section id="hadiah">
-            <PrizeSection />
-          </section>
-
-        {/* Realisasi  */}
-          <section>
-            <RealisasiSection />
-          </section>
-         
-         {/* Sponsor  */}
-          <section>
-            <SponsorSection />
-          </section>
-         
-          {/* Footer */}
-          <Footer />
-          {/* WhatsApp CTA hybrid */}
-          <HybridWhatsAppCTA />
-
-        </main>
-  );
-};
-
-export default LandingPage;
+    <>
+      <Navbar />
+      <main>
+        <HeroKakakAsuh />
+        <ProblemSection />
+        <ScaleSection />
+        <SolutionSection />
+        <ImpactSection />
+        <CTASection />
+      </main>
+      <Footer />
+    </>
+  )
+}
