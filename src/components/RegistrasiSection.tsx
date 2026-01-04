@@ -38,7 +38,7 @@ export default function RegistrasiSectionWrapper() {
   )
 }
 
-/* ================= MAIN FORM ================= */
+/* ================= MAIN ================= */
 function RegistrasiSection() {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
@@ -56,19 +56,13 @@ function RegistrasiSection() {
     },
   })
 
-  /* ===== Ambil data dari CTA (localStorage & URL) ===== */
+  /* ===== Ambil data CTA ===== */
   useEffect(() => {
-    // nominal dari CTA
     const storedNominal = localStorage.getItem("donation_amount")
-    if (storedNominal) {
-      setValue("nominal", storedNominal)
-    }
+    if (storedNominal) setValue("nominal", storedNominal)
 
-    // referrer / source
     const params = new URLSearchParams(window.location.search)
-    const ref =
-      params.get("ref") || localStorage.getItem("referrer")
-
+    const ref = params.get("ref") || localStorage.getItem("referrer")
     if (ref) {
       setValue("referrer", ref)
       localStorage.setItem("referrer", ref)
@@ -90,10 +84,9 @@ function RegistrasiSection() {
       if (!res.ok) throw new Error("Gagal submit")
 
       toast.success("Terima kasih 🤍", {
-        description: "Tim kami akan menghubungi Anda via WhatsApp.",
+        description: "Admin kami akan menghubungi Anda via WhatsApp.",
       })
 
-      // conversion tracking
       window.gtag?.("event", "complete_registration", {
         funnel: "kakak_asuh",
       })
@@ -104,7 +97,7 @@ function RegistrasiSection() {
       }, 1200)
     } catch {
       toast.error("Gagal mengirim", {
-        description: "Silakan coba lagi 🙏",
+        description: "Silakan coba kembali 🙏",
       })
     } finally {
       setSubmitting(false)
@@ -120,11 +113,22 @@ function RegistrasiSection() {
       <div className="mx-auto max-w-md">
         <div className="rounded-3xl border border-green-100 bg-white p-6 shadow-xl md:p-10">
           <h2 className="text-center text-3xl font-bold text-green-700">
-            Jadi Kakak Asuh
+            Daftar Jadi Kakak Asuh
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Satu komitmen Anda, satu masa depan anak terjaga.
+
+          <p className="mt-3 text-center text-sm text-gray-600 leading-relaxed">
+            Dukungan Anda membantu{" "}
+            <span className="font-semibold">
+              anak yatim, dhuafa, santri tahfizh,
+              serta siswa & mahasiswa berprestasi
+            </span>{" "}
+            tetap sekolah, sehat, dan tumbuh berkarakter.
           </p>
+
+          <div className="mt-4 rounded-xl bg-green-50 px-4 py-3 text-xs text-green-700">
+            Donasi dikelola oleh <strong>LAZ Graha Dhuafa Indonesia</strong>.
+            Aman, transparan, dan bisa dihentikan kapan saja.
+          </div>
 
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -142,7 +146,7 @@ function RegistrasiSection() {
               error={errors.email?.message}
             />
             <FormInput
-              label="No WhatsApp"
+              label="No WhatsApp Aktif"
               register={register("nohp")}
               error={errors.nohp?.message}
             />
@@ -154,7 +158,9 @@ function RegistrasiSection() {
               options={[
                 { label: "Rp 50.000", value: "50000" },
                 { label: "Rp 100.000", value: "100000" },
-                { label: "Rp 250.000", value: "250000" },
+                { label: "Rp 150.000", value: "150000" },
+                { label: "Rp 300.000", value: "300000" },
+                { label: "Rp 500.000", value: "500000" },
               ]}
             />
 
@@ -164,7 +170,7 @@ function RegistrasiSection() {
               error={errors.metode?.message}
               options={[
                 { label: "Transfer Bank", value: "bank" },
-                { label: "E-Wallet (OVO / Gopay / Dana)", value: "ewallet" },
+                { label: "E-Wallet (OVO / GoPay / DANA)", value: "ewallet" },
               ]}
             />
 
@@ -176,8 +182,8 @@ function RegistrasiSection() {
                 className="mt-1 accent-green-600"
               />
               <span>
-                Saya bersedia menjadi Kakak Asuh dan menunaikan sedekah rutin
-                sesuai kemampuan.
+                Saya bersedia menjadi Kakak Asuh dengan sedekah rutin
+                sesuai kemampuan, dan memahami komitmen ini bersifat fleksibel.
               </span>
             </label>
             {errors.komitmen && (
@@ -199,7 +205,7 @@ function RegistrasiSection() {
               ) : (
                 <>
                   <HeartHandshake className="h-5 w-5" />
-                  Saya Siap Menjadi Kakak Asuh
+                  Daftar Jadi Kakak Asuh
                 </>
               )}
             </button>

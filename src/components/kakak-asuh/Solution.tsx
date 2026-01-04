@@ -3,32 +3,51 @@
 import { motion } from "framer-motion"
 import {
   GraduationCap,
-  BookOpen,
-  HeartHandshake,
+  Utensils,
+  Shirt,
+  Brain,
+  HeartPulse,
+  Landmark,
+  Home,
   ShieldCheck,
 } from "lucide-react"
 import CTAButton from "../CTAButton"
 
-const solutions = [
+const supports = [
+  {
+    icon: Utensils,
+    title: "Kebutuhan Makan & Dasar",
+    desc: "Memenuhi biaya makan harian dan kebutuhan pokok agar anak bisa belajar dengan layak.",
+  },
   {
     icon: GraduationCap,
     title: "Biaya Pendidikan",
-    desc: "Membantu SPP, perlengkapan sekolah, dan kebutuhan belajar anak.",
+    desc: "Mendukung biaya sekolah & kampus, termasuk administrasi dan kebutuhan akademik.",
   },
   {
-    icon: BookOpen,
-    title: "Pembinaan Tahfizh",
-    desc: "Pendampingan hafalan Al-Qur’an bersama ustadz pembina terpercaya.",
+    icon: Shirt,
+    title: "Perlengkapan Belajar",
+    desc: "Seragam, tas, sepatu, buku, dan alat tulis yang menunjang proses belajar.",
   },
   {
-    icon: HeartHandshake,
-    title: "Pendampingan Rutin",
-    desc: "Monitoring perkembangan akademik, mental, dan spiritual anak.",
+    icon: Brain,
+    title: "Pembinaan Tahfizh & Akhlak",
+    desc: "Pendampingan hafalan Al-Qur’an, pembinaan karakter, dan bimbingan mental.",
   },
   {
-    icon: ShieldCheck,
-    title: "Amanah & Transparan",
-    desc: "Laporan rutin dan penyaluran dana yang jelas serta terverifikasi.",
+    icon: HeartPulse,
+    title: "Kesehatan & Gizi Dasar",
+    desc: "Pemeriksaan kesehatan, asupan gizi, dan perawatan dasar secara berkala.",
+  },
+  {
+    icon: Landmark,
+    title: "Kegiatan Keislaman",
+    desc: "Halaqah, setoran hafalan, pembinaan adab, dan penguatan nilai keislaman.",
+  },
+  {
+    icon: Home,
+    title: "Mukim & Pendampingan",
+    desc: "Fasilitas tinggal, lingkungan aman, serta pendampingan harian yang terarah.",
   },
 ]
 
@@ -36,7 +55,7 @@ export default function SolutionSection() {
   return (
     <section
       id="solution"
-      className="py-20 bg-gradient-to-b from-white to-blue-50"
+      className="bg-gradient-to-b from-white to-blue-50 py-20"
     >
       <div className="container mx-auto px-5 md:px-12">
         {/* Heading */}
@@ -45,39 +64,42 @@ export default function SolutionSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="max-w-3xl mx-auto text-center mb-12"
+          className="mx-auto mb-14 max-w-3xl text-center"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-800">
-            Solusi Nyata untuk Masa Depan Mereka
+          <h2 className="text-3xl font-bold text-slate-800 md:text-4xl">
+            Program Kakak Asuh & <br className="hidden md:block" />
+            Beasiswa Pendidikan
           </h2>
           <p className="mt-4 text-slate-600 leading-relaxed">
-            Program <span className="font-semibold">Kakak Asuh</span> hadir
-            sebagai pendamping jangka panjang, bukan bantuan sesaat.
+            Donasi Anda bukan sekadar bantuan sesaat, melainkan{" "}
+            <span className="font-semibold">
+              pendampingan jangka panjang
+            </span>{" "}
+            bagi anak-anak dan generasi muda yang sedang berjuang.
           </p>
         </motion.div>
 
-        {/* Solution Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-4xl mx-auto">
-          {solutions.map((item, i) => {
+        {/* Support Items */}
+        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {supports.map((item, i) => {
             const Icon = item.icon
             return (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45, delay: i * 0.08 }}
+                transition={{ duration: 0.45, delay: i * 0.06 }}
                 viewport={{ once: true }}
-                className="rounded-2xl border border-blue-100 bg-white p-6 shadow-sm hover:shadow-md transition"
+                className="rounded-2xl border border-blue-100 bg-white p-6 shadow-sm transition hover:shadow-md"
               >
                 <div className="mb-4 flex items-center gap-4">
                   <div className="rounded-xl bg-blue-100/70 p-3">
-                    <Icon className="h-7 w-7 text-blue-700" />
+                    <Icon className="h-6 w-6 text-blue-700" />
                   </div>
-                  <h3 className="text-lg font-bold text-slate-800">
+                  <h3 className="text-base font-bold text-slate-800">
                     {item.title}
                   </h3>
                 </div>
-
                 <p className="text-slate-600 leading-relaxed">
                   {item.desc}
                 </p>
@@ -86,19 +108,53 @@ export default function SolutionSection() {
           })}
         </div>
 
-        {/* CTA Bridge */}
+        {/* System & Trust */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="mt-14 text-center"
+          className="mx-auto mt-16 max-w-3xl rounded-2xl border border-blue-100 bg-white p-6 text-center shadow-sm"
+        >
+          <div className="mb-4 flex justify-center">
+            <div className="rounded-full bg-blue-100 p-3">
+              <ShieldCheck className="h-6 w-6 text-blue-700" />
+            </div>
+          </div>
+
+          <p className="text-slate-700 leading-relaxed">
+            🔒 Donasi tidak diberikan langsung ke anak, melainkan dikelola oleh
+            pengurus program untuk menjamin keberlanjutan.
+            <br />
+            📆 Komitmen fleksibel 3, 6, atau 12 bulan — mulai dari{" "}
+            <span className="font-semibold">Rp50.000/bulan</span>.
+            <br />
+            👥 Bisa untuk individu, keluarga, komunitas, maupun patungan kantor.
+          </p>
+
+          <p className="mt-4 text-sm text-slate-500">
+            Program ini dikelola di bawah{" "}
+            <span className="font-semibold">
+              LAZ Graha Dhuafa Indonesia
+            </span>
+            , lembaga resmi dengan laporan rutin dan pengelolaan amanah.
+          </p>
+        </motion.div>
+
+        {/* CTA */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+          className="mt-10 text-center"
         >
           <CTAButton
             source="solution"
-            variant="secondary"
-            label="Saya Ingin Menjadi Kakak Asuh"
-            />
+            variant="primary"
+            size="lg"
+            label="Saya Siap Menjadi Kakak Asuh"
+          />
         </motion.div>
       </div>
     </section>

@@ -25,8 +25,9 @@ export default function Footer() {
 
             <p className="text-green-100 text-sm md:text-base leading-relaxed max-w-md">
               Program pendampingan dan beasiswa pendidikan bagi anak-anak yatim &
-              dhuafa penghafal Al-Qur’an agar tetap sekolah, sehat, dan tumbuh
-              dalam lingkungan Qur’ani.
+              dhuafa, santri penghafal Al-Qur’an, serta siswa dan mahasiswa
+              berprestasi agar tetap sekolah, berkembang optimal, dan tumbuh
+              dalam lingkungan yang aman dan Qur’ani.
             </p>
 
             <p className="text-green-200 text-sm">
@@ -74,10 +75,10 @@ export default function Footer() {
 
             <div className="flex gap-4 mt-4">
               <a
-                href="https://instagram.com/grahadhuafa"
+                href="https://instagram.com/grahadhuafaorg"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Instagram Graha Dhuafa"
+                aria-label="Instagram Graha Dhuafa Indonesia"
                 className="hover:text-green-300 transition"
               >
                 <Instagram className="w-6 h-6" />
@@ -98,7 +99,7 @@ export default function Footer() {
         {/* Hashtag / Trust Signal */}
         <div className="text-center mb-8">
           <p className="text-green-100 text-sm">
-            Program Pendidikan & Pendampingan Yatim Dhuafa
+            Program Pendidikan & Pendampingan Yatim, Dhuafa, dan Generasi Berprestasi
           </p>
           <p className="font-semibold text-green-50 mt-1">
             #KakakAsuhTahfizh &nbsp; #SedekahRutin &nbsp; #PahalaJariyah
