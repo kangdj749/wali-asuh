@@ -37,7 +37,7 @@ export default function HeroKakakAsuh() {
         className="relative flex min-h-[92vh] items-center"
       >
         <Image
-          src="/wali-asuh.jpg"
+          src="/wali-asuh1.jpg"
           alt="Program Kakak Asuh & Beasiswa Pendidikan"
           fill
           priority
